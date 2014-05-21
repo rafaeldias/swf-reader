@@ -1,6 +1,6 @@
 ## SWF Reader
   
-  Simple [node][nodejs] module for reading a [SWF format][swf-format].
+  A simple [node][nodejs] module for reading a [SWF format][swf-format].
 
 ## Installation
 
@@ -20,7 +20,7 @@ SWFReader.read( 'swf_path.swf', function(err, swf) {
 
 ## SWF Object
 
-The SWG Object passed to the `callback` function of the `read` method has the following properties :
+The SWF Object passed to the `callback` function of the `read` method has the following properties :
 
 * `version`: The SWF version.
 * `size`: The SWF size in bytes.
@@ -29,7 +29,7 @@ The SWG Object passed to the `callback` function of the `read` method has the fo
 * `frameCount`: How many frames there're in the SWF.
 * `tags`: An array of `tag`. Each item in the array is an object with the folowing properties:
   * `code`: A number representing the type of the tag. (see [SWF format][swf-format] for more information)
-  * `length`: The length of the tag in bytes
+  * `length`: The length of the tag in bytes.
 
 ## Running test
 
@@ -41,8 +41,8 @@ $ npm test
 
 ## Todo
 
-* Read Tags' fields 
-* Write in Tags block
+* Read Tags' fields. 
+* Write in Tags block.
 
 ## Contributors
 
