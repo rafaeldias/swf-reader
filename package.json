@@ -1,0 +1,30 @@
+{
+  "name": "swf-reader",
+  "version": "0.0.1",
+  "description": "A simple node module for reading SWF format",
+  "main": "index.js",
+  "dependencies": {
+    "lzma-purejs" : "~0.9.3"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/test.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rafaeldias/swf-reader"
+  },
+  "keywords": [
+    "swf",
+    "flash",
+    "adobe"
+  ],
+  "author": "Rafael Leal Dias <rafaeldias.c@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rafaeldias/swf-reader/issues"
+  },
+  "homepage": "https://github.com/rafaeldias/swf-reader"
+}
