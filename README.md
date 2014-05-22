@@ -34,7 +34,7 @@ The SWF Object passed to the `callback` function of the `read` method has the fo
 * `frameRate`: The SWF framerate.
 * `frameCount`: Number of frames in the SWF.
 * `tags`: An array of `tag`. Each item in the array is an object with a `header` property with the folowing properties:
-  * `code`: A number representing the type of the tag. (see [SWF format][swf-format] for more information)
+  * `code`: A number indicating the type of the tag. (see [SWF format][swf-format] for more information)
   * `length`: The length of the tag in bytes.
 
 ## Running test
