@@ -65,7 +65,7 @@ exports.read = function(file, next) {
  * @api private
  */ 
 
-function uncompressed(buff, compressed_buff next) { 
+function uncompressed(buff, compressed_buff, next) { 
   buff.seek(3);// start
 
   var swf = {
