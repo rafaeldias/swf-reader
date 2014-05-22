@@ -1,6 +1,6 @@
 {
   "name": "swf-reader",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple node module for reading SWF format",
   "main": "index.js",
   "dependencies": {
