@@ -23,7 +23,7 @@ SWFReader.read( 'swf_path.swf', function(err, swf) {
 The SWF Object passed to the `callback` function of the `read` method has the following properties :
 
 * `version`: The SWF version.
-* `size`: The SWF size in bytes.
+* `size`: The SWF uncompressed size in bytes.
 * `frameSize`: An Object containing the `width` and `height` of the SWF.
 * `fps`: The SWF framerate.
 * `frameCount`: Number of frames in the SWF.
