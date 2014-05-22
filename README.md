@@ -52,6 +52,6 @@ $ npm test
 
 MIT 
 
-[nodejs]: www.nodejs.org
+[nodejs]: http://www.nodejs.org
 [swf-format]: http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/swf/pdf/swf-file-format-spec.pdf
 [rdleal-git]: https://github.com/rafaeldias
