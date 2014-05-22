@@ -33,7 +33,7 @@ The SWF Object passed to the `callback` function of the `read` method has the fo
 
 ## Running test
 
-To run the test, invoke the following command : 
+To run the test invoke the following command within the repo directory : 
 
 ```sh
 $ npm test
