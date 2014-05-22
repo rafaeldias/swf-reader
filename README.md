@@ -14,6 +14,10 @@ $ npm install swf-reader
 var SWFReader = require('swf-reader');
 
 SWFReader.read( 'swf_path.swf', function(err, swf) {
+  if ( err ) {
+    // handle error
+    ...
+  }
   console.log(swf.version);
 });
 ``` 
@@ -23,11 +27,13 @@ SWFReader.read( 'swf_path.swf', function(err, swf) {
 The SWF Object passed to the `callback` function of the `read` method has the following properties :
 
 * `version`: The SWF version.
-* `size`: The SWF uncompressed size in bytes.
+* `fileLength`: An Object containing the following properties :
+  * `compressed`: The SWF compressed size in bytes.
+  * `uncompressed`: The SWF uncompressed size in bytes.
 * `frameSize`: An Object containing the `width` and `height` of the SWF.
-* `fps`: The SWF framerate.
+* `frameRate`: The SWF framerate.
 * `frameCount`: Number of frames in the SWF.
-* `tags`: An array of `tag`. Each item in the array is an object with the folowing properties:
+* `tags`: An array of `tag`. Each item in the array is an object with a `header` property with the folowing properties:
   * `code`: A number representing the type of the tag. (see [SWF format][swf-format] for more information)
   * `length`: The length of the tag in bytes.
 

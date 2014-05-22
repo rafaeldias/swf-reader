@@ -2,7 +2,11 @@ var fs = require('fs')
   , zlib = require('zlib') 
   , lzma = require('lzma-purejs')
   , SWFBuffer = require('./lib/swf-buffer')
-  , SWFTags = require('./lib/swf-tags')
+  , SWFTags = require('./lib/swf-tags') 
+
+/* Exposes Tags constants */
+
+exports.TAGS = SWFTags;
 
 /**
  * Reads SWF file
@@ -33,16 +37,16 @@ exports.read = function(file, next) {
             return;
           } 
           uncompressed_buff = Buffer.concat([swf.slice(0, 8), result]);
-          uncompressed(new SWFBuffer( uncompressed_buff ), next);
+          uncompressed(new SWFBuffer( uncompressed_buff ), swf, next);
         });
         break;
       case 'FWS' : // uncompressed
-        uncompressed(new SWFBuffer( swf ), next);
+        uncompressed(new SWFBuffer( swf ), swf, next);
         break;
       case 'ZWS' : // LZMA compressed 
         uncompressed_buff = Buffer.conca([swf.slice(0, 8), lzma.uncompressFile( compressed_buff )]);
         
-        uncompressed(new SWFBuffer( uncompressed_buff ), next) ;
+        uncompressed(new SWFBuffer( uncompressed_buff ), swf, next) ;
         
         break;
       default :
@@ -56,28 +60,45 @@ exports.read = function(file, next) {
  * Reads tags and their contents, passaing a SWF object to next
  *
  * @param {SWFBuffer} buff
+ * @param {Buffer} compressed_buff
  * @param {function} next
  * @api private
  */ 
 
-function uncompressed(buff, next) { 
+function uncompressed(buff, compressed_buff next) { 
   buff.seek(3);// start
 
   var swf = {
         version     : buff.readUInt8(),
-        size        : buff.readUIntLE(32),
+        fileLength  : {
+          compressed    : compressed_buff.length,
+          uncompressed  : buff.readUIntLE(32) 
+        },
         frameSize   : buff.readRect(), // Returns a RECT object. i.e : { x : 0, y : 0, width : 200, height: 300 }
-        fps         : buff.readUIntLE(16)/256,
-        frameCount  : buff.readUIntLE(16),
-        tags        : []
+        frameRate   : buff.readUIntLE(16)/256,
+        frameCount  : buff.readUIntLE(16)
       }
-    , tag;
+    , tagHeader
+    , tag
+    , tags = [];
 
-  while( ( tag = buff.readTagCodeAndLength() ) ) { // Reads TagCodeAndLength from Tag's RECORDHEADER
-    swf.tags.push(tag); 
+  while( ( tagHeader = buff.readTagCodeAndLength() ) ) { // Reads TagCodeAndLength from Tag's RECORDHEADER
     // TODO: Read Tags' content
-    buff.pointer += tag.length;
+    tag = {
+      header : tagHeader
+    };
+    /*switch( tagHeader.code ) {
+      case SWFTags.FileAttributes : 
+        break;
+      default:
+        buff.pointer += tag.length;
+        break;
+    }*/
+    buff.pointer += tagHeader.length;
+    tags.push(tag); 
   }
+
+  swf.tags = tags;
 
   next( null, swf );
 } 
