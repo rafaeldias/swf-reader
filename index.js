@@ -16,6 +16,8 @@ exports.TAGS = SWFTags;
  * @api public
  */
 
+
+
 exports.read = function(file, next) {
 
   fs.readFile(file, function(err, swf) {
@@ -24,10 +26,18 @@ exports.read = function(file, next) {
       return;
     } 
 
-    var compressed_type = swf.toString('ascii', 0, 3) // (CWS|FWS|ZWS)
+    readBuffer(swf,next);
+
+    
+  });
+};
+
+
+var readBuffer = exports.readBuffer = function (swf, next) {
+  var compressed_type = swf.toString('ascii', 0, 3) // (CWS|FWS|ZWS)
       , compressed_buff = swf.slice(8)
       , uncompressed_buff; 
-
+      console.log(compressed_type);
     // uncompress buffer
     switch( compressed_type ) {
       case 'CWS' : // zlib compressed
@@ -44,7 +54,7 @@ exports.read = function(file, next) {
         uncompressed(new SWFBuffer( swf ), swf, next);
         break;
       case 'ZWS' : // LZMA compressed 
-        uncompressed_buff = Buffer.conca([swf.slice(0, 8), lzma.uncompressFile( compressed_buff )]);
+        uncompressed_buff = Buffer.concat([swf.slice(0, 8), lzma.uncompressFile( compressed_buff )]);
         
         uncompressed(new SWFBuffer( uncompressed_buff ), swf, next) ;
         
@@ -52,9 +62,11 @@ exports.read = function(file, next) {
       default :
         next( new Error('Unknown SWF compression') );
         break;
-    }
-  });
+    };
 };
+
+
+
 
 /**
  * Reads tags and their contents, passaing a SWF object to next
