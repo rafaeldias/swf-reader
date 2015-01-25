@@ -1,10 +1,10 @@
 {
   "name": "swf-reader",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A simple node module for reading SWF format",
   "main": "index.js",
   "dependencies": {
-    "lzma-purejs" : "~0.9.3"
+    "lzma-purejs": "~0.9.3"
   },
   "directories": {
     "test": "test"
