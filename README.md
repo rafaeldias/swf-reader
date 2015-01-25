@@ -53,8 +53,8 @@ $ npm test
 
 ## Todo
 
-* Read Tags' fields. 
-* Write in Tags block.
+* Read tags fields. 
+* Write in tags block.
 
 ## Contributors
 
