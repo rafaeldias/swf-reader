@@ -1,43 +1,43 @@
+/**
+ * Simple module for reading SWF properties
+ *
+ * (c) 2014 Rafael Leal Dias <rafaeldias.c at gmail dot com>
+ * MIT LICENCE
+ *
+ */
+
 var fs = require('fs')
   , zlib = require('zlib') 
   , lzma = require('lzma-purejs')
   , SWFBuffer = require('./lib/swf-buffer')
   , SWFTags = require('./lib/swf-tags') 
+  , SWFReader = exports;
 
-/* Exposes Tags constants */
-
-exports.TAGS = SWFTags;
 
 /**
- * Reads SWF file
+ * Check if file is Buffer or ArrayBuffer
+ * for future support for client usage
  *
- * @param {String} file
- * @param {function} next
- * @api public
+ * @param {Buffer|ArrayBuffer) b
+ * @api private
+ *
  */
+function isBuffer(b) {
+  return typeof Buffer !== "undefined" && Buffer.isBuffer(b) || b instanceof ArrayBuffer;
+}
 
-
-
-exports.read = function(file, next) {
-
-  fs.readFile(file, function(err, swf) {
-    if ( err ) { 
-      next(err);
-      return;
-    } 
-
-    readBuffer(swf,next);
-
-    
-  });
-};
-
-
-var readBuffer = exports.readBuffer = function (swf, next) {
+/**
+ * Uncompress SWF and start reading it
+ *
+ * @param {Buffer|ArrayBuffer} swf
+ * @param {function} callback
+ *
+ */
+function uncompress(swf, next) {
   var compressed_type = swf.toString('ascii', 0, 3) // (CWS|FWS|ZWS)
-      , compressed_buff = swf.slice(8)
-      , uncompressed_buff; 
-      console.log(compressed_type);
+    , compressed_buff = swf.slice(8)
+    , uncompressed_buff; 
+
     // uncompress buffer
     switch( compressed_type ) {
       case 'CWS' : // zlib compressed
@@ -47,16 +47,16 @@ var readBuffer = exports.readBuffer = function (swf, next) {
             return;
           } 
           uncompressed_buff = Buffer.concat([swf.slice(0, 8), result]);
-          uncompressed(new SWFBuffer( uncompressed_buff ), swf, next);
+          readSWFBuff(new SWFBuffer( uncompressed_buff ), swf, next);
         });
         break;
-      case 'FWS' : // uncompressed
-        uncompressed(new SWFBuffer( swf ), swf, next);
+      case 'FWS' : // already uncompressed
+        readSWFBuff(new SWFBuffer( swf ), swf, next);
         break;
       case 'ZWS' : // LZMA compressed 
         uncompressed_buff = Buffer.concat([swf.slice(0, 8), lzma.uncompressFile( compressed_buff )]);
         
-        uncompressed(new SWFBuffer( uncompressed_buff ), swf, next) ;
+        readSWFBuff(new SWFBuffer( uncompressed_buff ), swf, next) ;
         
         break;
       default :
@@ -65,19 +65,16 @@ var readBuffer = exports.readBuffer = function (swf, next) {
     };
 };
 
-
-
-
 /**
- * Reads tags and their contents, passaing a SWF object to next
+ * Reads tags and their contents, passaing a SWF object to callback 
  *
  * @param {SWFBuffer} buff
  * @param {Buffer} compressed_buff
- * @param {function} next
+ * @param {function} callback 
  * @api private
+ *
  */ 
-
-function uncompressed(buff, compressed_buff, next) { 
+function readSWFBuff(buff, compressed_buff, next) { 
   buff.seek(3);// start
 
   var swf = {
@@ -114,3 +111,28 @@ function uncompressed(buff, compressed_buff, next) {
 
   next( null, swf );
 } 
+
+/* Exposes Tags constants */ 
+SWFReader.TAGS = SWFTags;
+
+/**
+ * Reads SWF file
+ *
+ * @param {string} file
+ * @param {function} next
+ * @api public
+ *
+ */
+exports.read = function(file, next) {
+  if (isBuffer(file)) { 
+    uncompress(file, next);
+  } else {
+    fs.readFile(file, function(err, swf) {
+      if ( err ) { 
+        next(err);
+        return;
+      }
+      uncompress(swf, next);
+    });
+  }
+};

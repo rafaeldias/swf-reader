@@ -22,6 +22,12 @@ SWFReader.read( 'swf_path.swf', function(err, swf) {
 });
 ``` 
 
+## SWFReader.read(file, callback)
+
+Returns a `SWF Object` (described bellow) to `callback` function. If it's not possible to read the SWF, an error object is passed as the first argument of `callback`.
+
+The `file` parameter is a file path or a buffer of the SWF file.
+
 ## SWF Object
 
 The SWF Object passed to the `callback` function of the `read` method has the following properties :
