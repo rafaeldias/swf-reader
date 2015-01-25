@@ -18,7 +18,7 @@ SWFReader.read( 'swf_path.swf', function(err, swf) {
     // handle error
     ...
   }
-  console.log(swf.version);
+  console.log(swf);
 });
 ``` 
 
