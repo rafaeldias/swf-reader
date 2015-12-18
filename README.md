@@ -43,6 +43,7 @@ The SWF Object method has the following properties :
 * `frameSize`: An Object containing the `width` and `height` of the SWF.
 * `frameRate`: The SWF framerate.
 * `frameCount`: Number of frames in the SWF.
+* `backgroundColor`: The background color of the SWF in the format `#XXXXXX`.
 * `fileAttributes`: FileAtributtes defines characteristics of the SWF file.
   * `useNetwork`: If `true`, the SWF file is given network file access when loaded locally.
   * `as3`: If `true`, the SWF uses ActionScript 3.0. Otherwise it uses ActionScript 1.0 or 2.0.
