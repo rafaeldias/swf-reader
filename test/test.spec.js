@@ -3,9 +3,11 @@ var SWFReader = require('../index')
   , SWFInfo = function(swf) {
       console.log('SWF version : ' + swf.version);
       console.log('SWF size : ' + swf.frameSize.width + 'x' + swf.frameSize.height);
+      console.log('SWF background : ' + swf.backgroundColor);
       console.log('SWF compressed bytes : ' + swf.fileLength.compressed + ', uncompressed bytes : ' + swf.fileLength.uncompressed);
       console.log('SWF frameRate : ' + swf.frameRate);
       console.log('SWF frames : ' + swf.frameCount);
+      console.log('Test OK.');
     };
 
 if ( process.env.TEST_FILE ) {
@@ -16,7 +18,6 @@ if ( process.env.TEST_FILE ) {
       return;
     }
 
-    console.log('Test OK.'); 
     SWFInfo(swf);
 
     console.log('Testing buffer...');
@@ -33,17 +34,17 @@ if ( process.env.TEST_FILE ) {
           return;
         }
 
-        console.log('Test OK.');
         SWFInfo(swf);
+
+        console.log('Testing Sync...');
+        SWFInfo(SWFReader.readSync(buff));
+
+
+        //console.log('Tags:');
+        //console.log(swf.tags);
       });
     });
   });
 }else{
     throw new Error("TEST_FILE env var not set to .swf");
 }
-
-
-
-
-
-
