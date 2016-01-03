@@ -97,7 +97,7 @@ function readSWFTags(buff, swf) {
       //   * scaling stroke
       //   */
       //  tag.UsesScalingStrokes = buff.readBits(1);
-      //  tag.shapes = readShapeWithStyle(buff);
+      //  tag.shapes = buff.readShapeWithStyle();
       //  break;
       case SWFTags.FrameLabel :
         tag.name = buff.readString()
@@ -106,10 +106,11 @@ function readSWFTags(buff, swf) {
         if (l & (tagHeader.length - 1) != l)
           tag.anchor = buff.readUInt8();
         break;
-      /*case SWFTags.DefineSprite :
-        tag.SpriteID = buff.readUintLE(16);
-        tag.FrameCount = buff.readUintLE(16);
-        break;*/
+      case SWFTags.DefineSprite :
+        tag.SpriteID = buff.readUIntLE(16);
+        tag.FrameCount = buff.readUIntLE(16);
+        tag.ControlTags = readSWFTags(buff, swf);
+        break;
       case SWFTags.ExportAssets :
         tag.count = buff.readUIntLE(16); 
         tag.assets = [];
@@ -171,8 +172,8 @@ function readSWFTags(buff, swf) {
         tag.password = buff.readString()
         break;
       case SWFTags.EnableDebugger2 : 
-        if (0 !== buff.readUintLE(16)) {
-          throw new Error('Reserved bit used.');
+        if (0 !== buff.readUIntLE(16)) {
+          throw new Error('Reserved bit for EnableDebugger2 used.');
         }
         tag.password = buff.readString()
         break;
@@ -207,11 +208,8 @@ function readSWFTags(buff, swf) {
         tag.depth = buff.readUIntLE(16);
         tag.tabIndex = buff.readUIntLE(16);
         break;
-      case SWFTags.DefineScalingGrid :
-        tag.characterId = buff.readUIntLE(16);
-        tag.splitter = buff.readRect();
-        break;
       default:
+        tag.data = buff.buffer.slice(buff.pointer, buff.pointer + tagHeader.length);
         buff.pointer += tagHeader.length;
         break;
     }

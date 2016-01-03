@@ -40,8 +40,8 @@ if ( process.env.TEST_FILE ) {
         SWFInfo(SWFReader.readSync(buff));
 
 
-        //console.log('Tags:');
-        //console.log(swf.tags);
+        console.log('Tags:');
+        console.log(swf.tags);
       });
     });
   });
