@@ -348,7 +348,7 @@ SWFReader.read = SWFReader.readSync = function(file, next) {
         uncompress(swf, next);
       });
     } else {
-      return unconmpress(fs.readFileSync(file));
+      return uncompress(fs.readFileSync(file));
     }
   }
 };
