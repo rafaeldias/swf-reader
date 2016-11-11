@@ -209,7 +209,9 @@ function readSWFTags(buff, swf) {
         tag.tabIndex = buff.readUIntLE(16);
         break;
       case SWFTags.DoAction:
+        var pointerend = buff.pointer + tagHeader.length;
         tag.actions = readDoAction(buff);
+        buff.pointer = pointerend;
         break;
       default:
         tag.data = buff.buffer.slice(buff.pointer, buff.pointer + tagHeader.length);
