@@ -232,6 +232,7 @@ function readDoAction(buff){
     };
     if(actionCode >= 0x80) {
       var length = buff.readUIntLE(16);   
+      var end = buff.pointer + length;
       // see other actions
       // http://www.doc.ic.ac.uk/lab/labman/swwf/SWFalexref.html#tag_doaction   
       switch(actionCode) {
@@ -242,12 +243,58 @@ function readDoAction(buff){
           for(i=0; i<count; i++) {
             action.dictionary.push(buff.readString());
           }
+          actions.push(action);
+          break;
+        // Push Data
+        case 0x96:
+          while(buff.pointer != end) {
+            var type = buff.readUInt8();
+            var push = {
+              code: actionCode,
+              type: type,
+              data: readData(buff, type)
+            };
+            actions.push(push);
+          }
           break;
       }
     }
-    actions.push(action);
+    else {
+        actions.push(action);
+    }
   }
   return actions;
+}
+
+function readData(buff, type) {
+  switch(type) {
+    case 0x00:
+      return buff.readString();
+    case 0x01:
+      // read 32bits float?      
+      buff.pointer += 4;
+      return 0;
+    case 0x02:
+      return null;
+    case 0x03:
+      return undefined;
+    case 0x04:
+      return buff.readUInt8();
+    case 0x05:
+      return buff.readUInt8() == 1;
+    case 0x06:
+      // read 64bits double?      
+      buff.pointer += 8;
+      return 0;
+    case 0x07:
+      return buff.readUIntLE(32);
+    case 0x08:
+      return buff.readUInt8();
+    case 0x09:
+      return buff.readUIntLE(16);
+    default:
+      return undefined;
+  }
 }
 
 
