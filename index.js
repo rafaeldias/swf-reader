@@ -208,6 +208,11 @@ function readSWFTags(buff, swf) {
         tag.depth = buff.readUIntLE(16);
         tag.tabIndex = buff.readUIntLE(16);
         break;
+      case SWFTags.DoAction:
+        var pointerend = buff.pointer + tagHeader.length;
+        tag.actions = readDoAction(buff);
+        buff.pointer = pointerend;
+        break;
       default:
         tag.data = buff.buffer.slice(buff.pointer, buff.pointer + tagHeader.length);
         buff.pointer += tagHeader.length;
@@ -217,6 +222,81 @@ function readSWFTags(buff, swf) {
   }
   return tags;
 }
+
+function readDoAction(buff){
+  var actionCode;
+  var actions = [];
+  while((actionCode = buff.readUInt8()) != 0) {
+    var action = {
+      code: actionCode 
+    };
+    if(actionCode >= 0x80) {
+      var length = buff.readUIntLE(16);   
+      var end = buff.pointer + length;
+      // see other actions
+      // http://www.doc.ic.ac.uk/lab/labman/swwf/SWFalexref.html#tag_doaction   
+      switch(actionCode) {
+        // Declare Dictionary
+        case 0x88:          
+          var count = buff.readUIntLE(16);
+          action.dictionary = [];
+          for(i=0; i<count; i++) {
+            action.dictionary.push(buff.readString());
+          }
+          actions.push(action);
+          break;
+        // Push Data
+        case 0x96:
+          while(buff.pointer != end) {
+            var type = buff.readUInt8();
+            var push = {
+              code: actionCode,
+              type: type,
+              data: readData(buff, type)
+            };
+            actions.push(push);
+          }
+          break;
+      }
+    }
+    else {
+        actions.push(action);
+    }
+  }
+  return actions;
+}
+
+function readData(buff, type) {
+  switch(type) {
+    case 0x00:
+      return buff.readString();
+    case 0x01:
+      // read 32bits float?      
+      buff.pointer += 4;
+      return 0;
+    case 0x02:
+      return null;
+    case 0x03:
+      return undefined;
+    case 0x04:
+      return buff.readUInt8();
+    case 0x05:
+      return buff.readUInt8() == 1;
+    case 0x06:
+      // read 64bits double?      
+      buff.pointer += 8;
+      return 0;
+    case 0x07:
+      return buff.readUIntLE(32);
+    case 0x08:
+      return buff.readUInt8();
+    case 0x09:
+      return buff.readUIntLE(16);
+    default:
+      return undefined;
+  }
+}
+
 
 /**
  * Reads tags and their contents, passaing a SWF object to callback 
@@ -294,12 +374,10 @@ function uncompress(swf, next) {
         break;
       case 0x46 : // uncompressed
         return readSWFBuff(new SWFBuffer( swf ), swf, next);
-        break;
       case 0x5a : // LZMA compressed 
         uncompressed_buff = Buffer.concat([swf.slice(0, 8), lzma.decompressFile(compressed_buff)]);
         
         return readSWFBuff(new SWFBuffer(uncompressed_buff), swf, next); 
-        break;
       default :
         e = new Error('Unknown SWF compressions');
 
