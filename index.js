@@ -245,6 +245,7 @@ function readDoAction(buff){
     }
     actions.push(action);
   }
+  return actions;
 }
 
 
@@ -324,12 +325,10 @@ function uncompress(swf, next) {
         break;
       case 0x46 : // uncompressed
         return readSWFBuff(new SWFBuffer( swf ), swf, next);
-        break;
       case 0x5a : // LZMA compressed 
         uncompressed_buff = Buffer.concat([swf.slice(0, 8), lzma.decompressFile(compressed_buff)]);
         
         return readSWFBuff(new SWFBuffer(uncompressed_buff), swf, next); 
-        break;
       default :
         e = new Error('Unknown SWF compressions');
 
