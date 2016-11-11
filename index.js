@@ -208,6 +208,9 @@ function readSWFTags(buff, swf) {
         tag.depth = buff.readUIntLE(16);
         tag.tabIndex = buff.readUIntLE(16);
         break;
+      case SWFTags.DoAction:
+        tag.actions = readDoAction(buff);
+        break;
       default:
         tag.data = buff.buffer.slice(buff.pointer, buff.pointer + tagHeader.length);
         buff.pointer += tagHeader.length;
@@ -217,6 +220,33 @@ function readSWFTags(buff, swf) {
   }
   return tags;
 }
+
+function readDoAction(buff){
+  var actionCode;
+  var actions = [];
+  while((actionCode = buff.readUInt8()) != 0) {
+    var action = {
+      code: actionCode 
+    };
+    if(actionCode >= 0x80) {
+      var length = buff.readUIntLE(16);   
+      // see other actions
+      // http://www.doc.ic.ac.uk/lab/labman/swwf/SWFalexref.html#tag_doaction   
+      switch(actionCode) {
+        // Declare Dictionary
+        case 0x88:          
+          var count = buff.readUIntLE(16);
+          action.dictionary = [];
+          for(i=0; i<count; i++) {
+            action.dictionary.push(buff.readString());
+          }
+          break;
+      }
+    }
+    actions.push(action);
+  }
+}
+
 
 /**
  * Reads tags and their contents, passaing a SWF object to callback 
